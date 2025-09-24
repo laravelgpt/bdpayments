@@ -11,6 +11,7 @@ use BDPayments\LaravelPaymentGateway\Exceptions\ConfigurationException;
 use BDPayments\LaravelPaymentGateway\Gateways\NagadGateway;
 use BDPayments\LaravelPaymentGateway\Gateways\BkashGateway;
 use BDPayments\LaravelPaymentGateway\Gateways\BinanceGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\PayPalGateway;
 use Illuminate\Support\Facades\Log;
 
 class PaymentManager
@@ -103,6 +104,7 @@ class PaymentManager
             'nagad' => 'Nagad Payment Gateway',
             'bkash' => 'bKash Payment Gateway',
             'binance' => 'Binance Payment Gateway',
+            'paypal' => 'PayPal Payment Gateway',
         ];
     }
 
@@ -111,7 +113,7 @@ class PaymentManager
      */
     public function isGatewaySupported(string $gateway): bool
     {
-        return in_array(strtolower($gateway), ['nagad', 'bkash', 'binance'], true);
+        return in_array(strtolower($gateway), ['nagad', 'bkash', 'binance', 'paypal'], true);
     }
 
     /**
@@ -148,6 +150,7 @@ class PaymentManager
             'nagad' => $this->createNagadGateway($config),
             'bkash' => $this->createBkashGateway($config),
             'binance' => $this->createBinanceGateway($config),
+            'paypal' => $this->createPayPalGateway($config),
             default => throw new ConfigurationException("Unsupported gateway: {$gateway}"),
         };
     }
@@ -213,5 +216,21 @@ class PaymentManager
             secretKey: $config['secret_key'],
             sandbox: $config['sandbox'] ?? true
         );
+    }
+
+    /**
+     * Create PayPal gateway instance
+     */
+    private function createPayPalGateway(array $config): PayPalGateway
+    {
+        $requiredFields = ['client_id', 'client_secret', 'mode'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required PayPal configuration: {$field}");
+            }
+        }
+
+        return new PayPalGateway($config);
     }
 }

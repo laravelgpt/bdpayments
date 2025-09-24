@@ -46,6 +46,13 @@ return [
             'secret_key' => env('BINANCE_SECRET_KEY'),
             'sandbox' => env('BINANCE_SANDBOX', true),
         ],
+        
+        'paypal' => [
+            'client_id' => env('PAYPAL_CLIENT_ID'),
+            'client_secret' => env('PAYPAL_CLIENT_SECRET'),
+            'mode' => env('PAYPAL_MODE', 'sandbox'), // sandbox or live
+            'brand_name' => env('PAYPAL_BRAND_NAME', 'BD Payments'),
+        ],
     ],
 
     /*
@@ -143,6 +150,23 @@ return [
         'encrypt_sensitive_data' => env('PAYMENT_ENCRYPT_SENSITIVE_DATA', true),
         'sanitize_logs' => env('PAYMENT_SANITIZE_LOGS', true),
         'require_https' => env('PAYMENT_REQUIRE_HTTPS', true),
+        'webhook_secret' => env('PAYMENT_WEBHOOK_SECRET'),
+        'hash_secret' => env('PAYMENT_HASH_SECRET', env('APP_KEY')),
+        'transaction_prefix' => env('PAYMENT_TRANSACTION_PREFIX', 'TXN'),
+        'reference_prefix' => env('PAYMENT_REFERENCE_PREFIX', 'REF'),
+        'max_amount' => env('PAYMENT_MAX_AMOUNT', 10000),
+        'min_amount' => env('PAYMENT_MIN_AMOUNT', 0.01),
+        'rate_limit' => [
+            'enabled' => env('PAYMENT_RATE_LIMIT_ENABLED', true),
+            'max_attempts' => env('PAYMENT_RATE_LIMIT_MAX_ATTEMPTS', 5),
+            'window_minutes' => env('PAYMENT_RATE_LIMIT_WINDOW_MINUTES', 15),
+        ],
+        'fraud_detection' => [
+            'enabled' => env('PAYMENT_FRAUD_DETECTION_ENABLED', true),
+            'suspicious_ip_check' => env('PAYMENT_SUSPICIOUS_IP_CHECK', true),
+            'rapid_payment_check' => env('PAYMENT_RAPID_PAYMENT_CHECK', true),
+            'unusual_amount_check' => env('PAYMENT_UNUSUAL_AMOUNT_CHECK', true),
+        ],
     ],
 
     /*

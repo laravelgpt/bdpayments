@@ -1,12 +1,12 @@
 # Laravel Payment Gateway Package
 
-A comprehensive Laravel 12 package for integrating Nagad, bKash, and Binance payment gateways with PHP 8.4+ support, featuring advanced payment management, invoice generation, and problem resolution.
+A comprehensive Laravel 12 package for integrating Nagad, bKash, Binance, and PayPal payment gateways with PHP 8.4+ support, featuring advanced payment management, invoice generation, problem resolution, and enhanced security features.
 
 ## Features
 
 - 🚀 **Laravel 12 & PHP 8.4+ Support** - Built with modern Laravel and PHP features
-- 💳 **Multiple Gateways** - Support for Nagad, bKash, and Binance payment gateways
-- 🔒 **Secure** - Built-in validation, rate limiting, and webhook signature verification
+- 💳 **Multiple Gateways** - Support for Nagad, bKash, Binance, and PayPal payment gateways
+- 🔒 **Enhanced Security** - Advanced fraud detection, payment tampering protection, data encryption, and comprehensive security features
 - 📝 **Comprehensive Logging** - Track all payment operations with detailed logs
 - 🧪 **Well Tested** - Full test coverage with PHPUnit and Laravel testing
 - 🛠️ **Easy Integration** - Simple facade and service provider integration
@@ -20,6 +20,10 @@ A comprehensive Laravel 12 package for integrating Nagad, bKash, and Binance pay
 - 📊 **Admin Dashboard** - Complete admin interface for payment management
 - 📈 **Analytics** - Payment statistics and reporting
 - 🎯 **Status Tracking** - Real-time payment status monitoring
+- 🛡️ **Fraud Protection** - Advanced fraud detection and prevention
+- 🔐 **Data Encryption** - Automatic encryption of sensitive payment data
+- 🚫 **Tampering Protection** - Payment integrity verification and hash validation
+- ⚡ **Rate Limiting** - Intelligent rate limiting to prevent abuse
 
 ## Installation
 
@@ -97,12 +101,17 @@ The package will create `config/payment-gateway.php` with comprehensive configur
 
 use BDPayments\LaravelPaymentGateway\Facades\PaymentGateway;
 
-// Initialize a payment
+// Initialize a payment with security features
 $response = PaymentGateway::initializePayment('nagad', [
     'order_id' => 'ORDER123',
     'amount' => 100.50,
     'currency' => 'BDT',
     'callback_url' => 'https://yourdomain.com/callback',
+    'payment_hash' => PaymentGateway::generatePaymentHash([
+        'order_id' => 'ORDER123',
+        'amount' => 100.50,
+        'currency' => 'BDT',
+    ]),
 ]);
 
 if ($response->success) {
@@ -230,6 +239,36 @@ $invoiceService->sendInvoice($invoice);
 
 // Generate PDF
 $pdf = $invoiceService->generateInvoicePdf($invoice);
+```
+
+### Security Features
+
+```php
+use BDPayments\LaravelPaymentGateway\Services\PaymentSecurityService;
+
+$securityService = app(PaymentSecurityService::class);
+
+// Generate secure payment hash
+$paymentHash = $securityService->generatePaymentHash([
+    'amount' => 100.50,
+    'currency' => 'BDT',
+    'reference_id' => 'REF123',
+]);
+
+// Verify payment integrity
+$isValid = $securityService->validatePaymentIntegrity($payment, $data);
+
+// Check rate limiting
+$canProceed = $securityService->checkRateLimit('user:123');
+
+// Detect fraudulent activity
+$fraudIndicators = $securityService->detectFraudulentActivity($ipAddress, $paymentData);
+
+// Encrypt sensitive data
+$encryptedData = $securityService->encryptPaymentData($sensitiveData);
+
+// Generate secure transaction ID
+$transactionId = $securityService->generateSecureTransactionId();
 ```
 
 ### Problem Resolution System
@@ -372,6 +411,17 @@ Route::middleware(['payment.gateway', 'payment.rate_limit:60,1'])->group(functio
 });
 ```
 
+### PaymentSecurityMiddleware
+
+Advanced security middleware with fraud detection and tampering protection.
+
+```php
+// Apply security middleware to routes
+Route::middleware(['payment.security'])->group(function () {
+    // Secure payment routes
+});
+```
+
 ## Views
 
 The package includes beautiful, responsive views:
@@ -468,6 +518,10 @@ BKASH_WEBHOOK_URL=https://yourdomain.com/payment/bkash/webhook
 BINANCE_WEBHOOK_ENABLED=true
 BINANCE_WEBHOOK_SECRET=your_webhook_secret
 BINANCE_WEBHOOK_URL=https://yourdomain.com/payment/binance/webhook
+
+PAYPAL_WEBHOOK_ENABLED=true
+PAYPAL_WEBHOOK_SECRET=your_webhook_secret
+PAYPAL_WEBHOOK_URL=https://yourdomain.com/payment/paypal/webhook
 ```
 
 ## Database Schema
@@ -480,11 +534,16 @@ The package includes migrations for:
 
 ## Security Features
 
-- **Rate Limiting** - Prevent abuse with configurable rate limits
+- **Advanced Fraud Detection** - Multi-layered fraud detection system
+- **Payment Tampering Protection** - Hash-based integrity verification
+- **Data Encryption** - Automatic encryption of sensitive payment data
+- **Rate Limiting** - Intelligent rate limiting to prevent abuse
 - **Webhook Signature Verification** - Secure webhook processing
 - **Data Sanitization** - Automatic sanitization of sensitive data
 - **HTTPS Enforcement** - Optional HTTPS requirement
 - **Input Validation** - Comprehensive validation rules
+- **CSRF Protection** - Nonce-based CSRF protection
+- **IP-based Security** - Suspicious IP detection and blocking
 
 ## Performance Features
 

@@ -247,4 +247,61 @@ return [
         'prefix' => env('PAYMENT_CACHE_PREFIX', 'payment_gateway'),
         'ttl' => env('PAYMENT_CACHE_TTL', 3600), // seconds
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | QR Code Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure QR code generation settings.
+    |
+    */
+
+    'qr_code' => [
+        'enabled' => env('QR_CODE_ENABLED', true),
+        'storage_path' => env('QR_CODE_STORAGE_PATH', 'qr-codes'),
+        'size' => env('QR_CODE_SIZE', 200),
+        'format' => env('QR_CODE_FORMAT', 'png'),
+        'error_correction' => env('QR_CODE_ERROR_CORRECTION', 'M'),
+        'margin' => env('QR_CODE_MARGIN', 1),
+        'cleanup_days' => env('QR_CODE_CLEANUP_DAYS', 30),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reports Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure reporting settings.
+    |
+    */
+
+    'reports' => [
+        'enabled' => env('REPORTS_ENABLED', true),
+        'cache_ttl' => env('REPORTS_CACHE_TTL', 3600),
+        'export_formats' => ['json', 'csv', 'excel', 'pdf'],
+        'dashboard_refresh' => env('REPORTS_DASHBOARD_REFRESH', 300), // 5 minutes
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure notification settings.
+    |
+    */
+
+    'notifications' => [
+        'mail' => [
+            'enabled' => env('PAYMENT_NOTIFICATIONS_MAIL_ENABLED', true),
+            'from_address' => env('PAYMENT_NOTIFICATIONS_FROM_ADDRESS', 'noreply@example.com'),
+            'from_name' => env('PAYMENT_NOTIFICATIONS_FROM_NAME', 'Payment System'),
+        ],
+        'slack' => [
+            'enabled' => env('PAYMENT_NOTIFICATIONS_SLACK_ENABLED', false),
+            'webhook_url' => env('PAYMENT_NOTIFICATIONS_SLACK_WEBHOOK_URL'),
+            'channel' => env('PAYMENT_NOTIFICATIONS_SLACK_CHANNEL', '#payments'),
+        ],
+    ],
 ];

@@ -15,6 +15,7 @@
         "php": "^8.4",
         "laravel/framework": "^12.0",
         "guzzlehttp/guzzle": "^7.8",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "ext-json": "*",
         "ext-curl": "*",
         "ext-openssl": "*",

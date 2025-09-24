@@ -28,6 +28,12 @@ A comprehensive Laravel 12 package for integrating multiple payment gateways (Na
 - 📊 **Smart Analytics** - AI-powered insights and recommendations
 - 🔮 **Predictive Analytics** - Payment failure prediction and risk assessment
 - 🎯 **Optimal Gateway Selection** - AI-driven gateway recommendation based on success rates
+- 📱 **QR Code Generation** - Dynamic QR codes for payments, invoices, and receipts
+- 📊 **Transaction Reports** - Comprehensive analytics and reporting system
+- 📈 **Export Functionality** - PDF, Excel, CSV export options
+- 📊 **Analytics Dashboard** - Real-time insights and metrics
+- 🔍 **Fraud Analysis** - Advanced fraud detection and risk assessment
+- 👥 **Customer Behavior Analysis** - Customer segmentation and behavior insights
 
 ## Installation
 
@@ -90,6 +96,28 @@ BINANCE_SANDBOX=true
 # Logging Configuration
 PAYMENT_LOGGING_ENABLED=true
 PAYMENT_LOG_LEVEL=info
+
+# QR Code Configuration
+QR_CODE_ENABLED=true
+QR_CODE_STORAGE_PATH=qr-codes
+QR_CODE_SIZE=200
+QR_CODE_FORMAT=png
+QR_CODE_ERROR_CORRECTION=M
+QR_CODE_MARGIN=1
+QR_CODE_CLEANUP_DAYS=30
+
+# Reports Configuration
+REPORTS_ENABLED=true
+REPORTS_CACHE_TTL=3600
+REPORTS_DASHBOARD_REFRESH=300
+
+# Notifications Configuration
+PAYMENT_NOTIFICATIONS_MAIL_ENABLED=true
+PAYMENT_NOTIFICATIONS_FROM_ADDRESS=noreply@example.com
+PAYMENT_NOTIFICATIONS_FROM_NAME=Payment System
+PAYMENT_NOTIFICATIONS_SLACK_ENABLED=false
+PAYMENT_NOTIFICATIONS_SLACK_WEBHOOK_URL=
+PAYMENT_NOTIFICATIONS_SLACK_CHANNEL=#payments
 ```
 
 ### Configuration File
@@ -368,6 +396,69 @@ $gateways = PaymentGateway::getSupportedGateways();
 
 // Check if gateway is supported
 $supported = PaymentGateway::isGatewaySupported(string $gateway);
+```
+
+### QR Code Generation
+
+```php
+use BDPayments\LaravelPaymentGateway\Services\QRCodeService;
+
+$qrCodeService = app(QRCodeService::class);
+
+// Generate QR code for payment
+$qrCode = $qrCodeService->generatePaymentQRCode($payment, [
+    'size' => 200,
+    'format' => 'png',
+    'store' => true,
+]);
+
+// Generate QR code for payment URL
+$qrCode = $qrCodeService->generatePaymentURLQRCode('https://example.com/payment/123');
+
+// Generate QR code for invoice
+$qrCode = $qrCodeService->generateInvoiceQRCode($payment);
+
+// Generate QR code with logo
+$qrCode = $qrCodeService->generateQRCodeWithLogo($data, '/path/to/logo.png');
+
+// Generate styled QR code
+$qrCode = $qrCodeService->generateStyledQRCode($data, [
+    'color' => [0, 0, 0],
+    'background_color' => [255, 255, 255],
+]);
+```
+
+### Transaction Reports
+
+```php
+use BDPayments\LaravelPaymentGateway\Services\TransactionReportService;
+
+$reportService = app(TransactionReportService::class);
+
+// Generate transaction report
+$report = $reportService->generateTransactionReport([
+    'date_from' => '2024-01-01',
+    'date_to' => '2024-12-31',
+    'gateway' => 'nagad',
+]);
+
+// Generate gateway performance report
+$performanceReport = $reportService->generateGatewayPerformanceReport();
+
+// Generate financial report
+$financialReport = $reportService->generateFinancialReport();
+
+// Generate fraud analysis report
+$fraudReport = $reportService->generateFraudAnalysisReport();
+
+// Generate customer behavior report
+$behaviorReport = $reportService->generateCustomerBehaviorReport();
+
+// Export report
+$exportedData = $reportService->exportReport($report, 'pdf');
+
+// Get dashboard data
+$dashboardData = $reportService->getDashboardData();
 ```
 
 ### Payment Model

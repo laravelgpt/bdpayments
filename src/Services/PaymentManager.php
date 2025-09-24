@@ -12,6 +12,15 @@ use BDPayments\LaravelPaymentGateway\Gateways\NagadGateway;
 use BDPayments\LaravelPaymentGateway\Gateways\BkashGateway;
 use BDPayments\LaravelPaymentGateway\Gateways\BinanceGateway;
 use BDPayments\LaravelPaymentGateway\Gateways\PayPalGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\RocketGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\UpayGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\SureCashGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\UCashGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\MCashGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\MyCashGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\AamarPayGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\ShurjoPayGateway;
+use BDPayments\LaravelPaymentGateway\Gateways\SSLCOMMERZGateway;
 use Illuminate\Support\Facades\Log;
 
 class PaymentManager
@@ -105,6 +114,15 @@ class PaymentManager
             'bkash' => 'bKash Payment Gateway',
             'binance' => 'Binance Payment Gateway',
             'paypal' => 'PayPal Payment Gateway',
+            'rocket' => 'Rocket Payment Gateway',
+            'upay' => 'Upay Payment Gateway',
+            'surecash' => 'SureCash Payment Gateway',
+            'ucash' => 'UCash Payment Gateway',
+            'mcash' => 'MCash Payment Gateway',
+            'mycash' => 'MyCash Payment Gateway',
+            'aamarpay' => 'AamarPay Payment Gateway',
+            'shurjopay' => 'ShurjoPay Payment Gateway',
+            'sslcommerz' => 'SSLCOMMERZ Payment Gateway',
         ];
     }
 
@@ -113,7 +131,10 @@ class PaymentManager
      */
     public function isGatewaySupported(string $gateway): bool
     {
-        return in_array(strtolower($gateway), ['nagad', 'bkash', 'binance', 'paypal'], true);
+        return in_array(strtolower($gateway), [
+            'nagad', 'bkash', 'binance', 'paypal', 'rocket', 'upay', 'surecash',
+            'ucash', 'mcash', 'mycash', 'aamarpay', 'shurjopay', 'sslcommerz'
+        ], true);
     }
 
     /**
@@ -151,6 +172,15 @@ class PaymentManager
             'bkash' => $this->createBkashGateway($config),
             'binance' => $this->createBinanceGateway($config),
             'paypal' => $this->createPayPalGateway($config),
+            'rocket' => $this->createRocketGateway($config),
+            'upay' => $this->createUpayGateway($config),
+            'surecash' => $this->createSureCashGateway($config),
+            'ucash' => $this->createUCashGateway($config),
+            'mcash' => $this->createMCashGateway($config),
+            'mycash' => $this->createMyCashGateway($config),
+            'aamarpay' => $this->createAamarPayGateway($config),
+            'shurjopay' => $this->createShurjoPayGateway($config),
+            'sslcommerz' => $this->createSSLCOMMERZGateway($config),
             default => throw new ConfigurationException("Unsupported gateway: {$gateway}"),
         };
     }
@@ -232,5 +262,149 @@ class PaymentManager
         }
 
         return new PayPalGateway($config);
+    }
+
+    /**
+     * Create Rocket gateway instance
+     */
+    private function createRocketGateway(array $config): RocketGateway
+    {
+        $requiredFields = ['api_key', 'secret_key', 'merchant_id'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required Rocket configuration: {$field}");
+            }
+        }
+
+        return new RocketGateway($config);
+    }
+
+    /**
+     * Create Upay gateway instance
+     */
+    private function createUpayGateway(array $config): UpayGateway
+    {
+        $requiredFields = ['api_key', 'secret_key', 'merchant_id'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required Upay configuration: {$field}");
+            }
+        }
+
+        return new UpayGateway($config);
+    }
+
+    /**
+     * Create SureCash gateway instance
+     */
+    private function createSureCashGateway(array $config): SureCashGateway
+    {
+        $requiredFields = ['api_key', 'secret_key', 'merchant_id'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required SureCash configuration: {$field}");
+            }
+        }
+
+        return new SureCashGateway($config);
+    }
+
+    /**
+     * Create UCash gateway instance
+     */
+    private function createUCashGateway(array $config): UCashGateway
+    {
+        $requiredFields = ['api_key', 'secret_key', 'merchant_id'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required UCash configuration: {$field}");
+            }
+        }
+
+        return new UCashGateway($config);
+    }
+
+    /**
+     * Create MCash gateway instance
+     */
+    private function createMCashGateway(array $config): MCashGateway
+    {
+        $requiredFields = ['api_key', 'secret_key', 'merchant_id'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required MCash configuration: {$field}");
+            }
+        }
+
+        return new MCashGateway($config);
+    }
+
+    /**
+     * Create MyCash gateway instance
+     */
+    private function createMyCashGateway(array $config): MyCashGateway
+    {
+        $requiredFields = ['api_key', 'secret_key', 'merchant_id'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required MyCash configuration: {$field}");
+            }
+        }
+
+        return new MyCashGateway($config);
+    }
+
+    /**
+     * Create AamarPay gateway instance
+     */
+    private function createAamarPayGateway(array $config): AamarPayGateway
+    {
+        $requiredFields = ['store_id', 'signature_key', 'api_key'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required AamarPay configuration: {$field}");
+            }
+        }
+
+        return new AamarPayGateway($config);
+    }
+
+    /**
+     * Create ShurjoPay gateway instance
+     */
+    private function createShurjoPayGateway(array $config): ShurjoPayGateway
+    {
+        $requiredFields = ['merchant_id', 'merchant_password', 'api_key'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required ShurjoPay configuration: {$field}");
+            }
+        }
+
+        return new ShurjoPayGateway($config);
+    }
+
+    /**
+     * Create SSLCOMMERZ gateway instance
+     */
+    private function createSSLCOMMERZGateway(array $config): SSLCOMMERZGateway
+    {
+        $requiredFields = ['store_id', 'store_password', 'api_key'];
+        
+        foreach ($requiredFields as $field) {
+            if (!isset($config[$field]) || empty($config[$field])) {
+                throw new ConfigurationException("Missing required SSLCOMMERZ configuration: {$field}");
+            }
+        }
+
+        return new SSLCOMMERZGateway($config);
     }
 }

@@ -53,6 +53,69 @@ return [
             'mode' => env('PAYPAL_MODE', 'sandbox'), // sandbox or live
             'brand_name' => env('PAYPAL_BRAND_NAME', 'BD Payments'),
         ],
+        
+        'rocket' => [
+            'api_key' => env('ROCKET_API_KEY'),
+            'secret_key' => env('ROCKET_SECRET_KEY'),
+            'merchant_id' => env('ROCKET_MERCHANT_ID'),
+            'sandbox' => env('ROCKET_SANDBOX', true),
+        ],
+        
+        'upay' => [
+            'api_key' => env('UPAY_API_KEY'),
+            'secret_key' => env('UPAY_SECRET_KEY'),
+            'merchant_id' => env('UPAY_MERCHANT_ID'),
+            'sandbox' => env('UPAY_SANDBOX', true),
+        ],
+        
+        'surecash' => [
+            'api_key' => env('SURECASH_API_KEY'),
+            'secret_key' => env('SURECASH_SECRET_KEY'),
+            'merchant_id' => env('SURECASH_MERCHANT_ID'),
+            'sandbox' => env('SURECASH_SANDBOX', true),
+        ],
+        
+        'ucash' => [
+            'api_key' => env('UCASH_API_KEY'),
+            'secret_key' => env('UCASH_SECRET_KEY'),
+            'merchant_id' => env('UCASH_MERCHANT_ID'),
+            'sandbox' => env('UCASH_SANDBOX', true),
+        ],
+        
+        'mcash' => [
+            'api_key' => env('MCASH_API_KEY'),
+            'secret_key' => env('MCASH_SECRET_KEY'),
+            'merchant_id' => env('MCASH_MERCHANT_ID'),
+            'sandbox' => env('MCASH_SANDBOX', true),
+        ],
+        
+        'mycash' => [
+            'api_key' => env('MYCASH_API_KEY'),
+            'secret_key' => env('MYCASH_SECRET_KEY'),
+            'merchant_id' => env('MYCASH_MERCHANT_ID'),
+            'sandbox' => env('MYCASH_SANDBOX', true),
+        ],
+        
+        'aamarpay' => [
+            'store_id' => env('AAMARPAY_STORE_ID'),
+            'signature_key' => env('AAMARPAY_SIGNATURE_KEY'),
+            'api_key' => env('AAMARPAY_API_KEY'),
+            'sandbox' => env('AAMARPAY_SANDBOX', true),
+        ],
+        
+        'shurjopay' => [
+            'merchant_id' => env('SHURJOPAY_MERCHANT_ID'),
+            'merchant_password' => env('SHURJOPAY_MERCHANT_PASSWORD'),
+            'api_key' => env('SHURJOPAY_API_KEY'),
+            'sandbox' => env('SHURJOPAY_SANDBOX', true),
+        ],
+        
+        'sslcommerz' => [
+            'store_id' => env('SSLCOMMERZ_STORE_ID'),
+            'store_password' => env('SSLCOMMERZ_STORE_PASSWORD'),
+            'api_key' => env('SSLCOMMERZ_API_KEY'),
+            'sandbox' => env('SSLCOMMERZ_SANDBOX', true),
+        ],
     ],
 
     /*

@@ -1,11 +1,11 @@
 # Laravel Payment Gateway Package
 
-A comprehensive Laravel 12 package for integrating Nagad, bKash, Binance, and PayPal payment gateways with PHP 8.4+ support, featuring advanced payment management, invoice generation, problem resolution, and enhanced security features.
+A comprehensive Laravel 12 package for integrating multiple payment gateways (Nagad, bKash, Binance, PayPal, Rocket, Upay, SureCash, UCash, MCash, MyCash, AamarPay, ShurjoPay, SSLCOMMERZ) with PHP 8.4+ support, featuring advanced payment management, invoice generation, problem resolution, enhanced security features, and AI-powered management.
 
 ## Features
 
 - 🚀 **Laravel 12 & PHP 8.4+ Support** - Built with modern Laravel and PHP features
-- 💳 **Multiple Gateways** - Support for Nagad, bKash, Binance, and PayPal payment gateways
+- 💳 **Multiple Gateways** - Support for 13+ payment gateways including Nagad, bKash, Binance, PayPal, Rocket, Upay, SureCash, UCash, MCash, MyCash, AamarPay, ShurjoPay, SSLCOMMERZ
 - 🔒 **Enhanced Security** - Advanced fraud detection, payment tampering protection, data encryption, and comprehensive security features
 - 📝 **Comprehensive Logging** - Track all payment operations with detailed logs
 - 🧪 **Well Tested** - Full test coverage with PHPUnit and Laravel testing
@@ -24,6 +24,10 @@ A comprehensive Laravel 12 package for integrating Nagad, bKash, Binance, and Pa
 - 🔐 **Data Encryption** - Automatic encryption of sensitive payment data
 - 🚫 **Tampering Protection** - Payment integrity verification and hash validation
 - ⚡ **Rate Limiting** - Intelligent rate limiting to prevent abuse
+- 🤖 **AI Agent** - Intelligent payment management, fraud detection, and automated support
+- 📊 **Smart Analytics** - AI-powered insights and recommendations
+- 🔮 **Predictive Analytics** - Payment failure prediction and risk assessment
+- 🎯 **Optimal Gateway Selection** - AI-driven gateway recommendation based on success rates
 
 ## Installation
 
@@ -269,6 +273,41 @@ $encryptedData = $securityService->encryptPaymentData($sensitiveData);
 
 // Generate secure transaction ID
 $transactionId = $securityService->generateSecureTransactionId();
+```
+
+### AI Agent Features
+
+```php
+use BDPayments\LaravelPaymentGateway\Services\AIAgentService;
+
+$aiAgent = app(AIAgentService::class);
+
+// Analyze payment patterns and detect anomalies
+$analysis = $aiAgent->analyzePaymentPatterns($payment);
+
+// Generate intelligent notifications
+$aiAgent->generateNotifications($payment, $analysis);
+
+// Provide customer support
+$support = $aiAgent->provideCustomerSupport(
+    'I need help with my payment',
+    ['payment_id' => $payment->id]
+);
+
+// Auto-resolve common problems
+$resolved = $aiAgent->autoResolveProblems();
+
+// Generate payment insights
+$insights = $aiAgent->generateInsights();
+
+// Suggest optimal gateway
+$optimalGateway = $aiAgent->suggestOptimalGateway($paymentData);
+
+// Predict payment failure
+$prediction = $aiAgent->predictPaymentFailure($payment);
+
+// Get refund recommendations
+$refundStrategy = $aiAgent->recommendRefundStrategy($payment);
 ```
 
 ### Problem Resolution System

@@ -557,22 +557,277 @@ class TransactionReportService
     }
 
     // Additional helper methods for specific report sections
-    private function getRevenueSummary($query, array $filters): array { return []; }
-    private function getRefundSummary(array $filters): array { return []; }
-    private function getNetRevenue($query, array $filters): array { return []; }
-    private function getCurrencyBreakdown($query, array $filters): array { return []; }
-    private function getMonthlyRevenue($query, array $filters): array { return []; }
-    private function getDailyRevenue($query, array $filters): array { return []; }
-    private function getTopProducts($query, array $filters): array { return []; }
-    private function getCustomerAnalysis($query, array $filters): array { return []; }
-    private function getFraudIndicators($query, array $filters): array { return []; }
-    private function getSuspiciousTransactions($query, array $filters): array { return []; }
-    private function getRiskAnalysis($query, array $filters): array { return []; }
-    private function getBlockedAttempts(array $filters): int { return 0; }
-    private function getFraudPreventionMetrics(array $filters): array { return []; }
-    private function getCustomerSegments($query, array $filters): array { return []; }
-    private function getPaymentPreferences($query, array $filters): array { return []; }
-    private function getCustomerLifetimeValue($query, array $filters): array { return []; }
-    private function getRetentionAnalysis($query, array $filters): array { return []; }
-    private function getChurnAnalysis($query, array $filters): array { return []; }
+    private function getRevenueSummary($query, array $filters): array 
+    { 
+        $totalRevenue = $query->where('status', 'completed')->sum('amount');
+        $refundedAmount = PaymentRefund::whereHas('payment', function($q) use ($filters) {
+            $this->applyFilters($q, $filters);
+        })->sum('amount');
+        
+        return [
+            'total_revenue' => $totalRevenue,
+            'refunded_amount' => $refundedAmount,
+            'net_revenue' => $totalRevenue - $refundedAmount,
+        ];
+    }
+    
+    private function getRefundSummary(array $filters): array 
+    { 
+        $refundQuery = PaymentRefund::query();
+        $this->applyFilters($refundQuery, $filters);
+        
+        return [
+            'total_refunds' => $refundQuery->count(),
+            'total_refund_amount' => $refundQuery->sum('amount'),
+            'average_refund_amount' => $refundQuery->avg('amount'),
+        ];
+    }
+    
+    private function getNetRevenue($query, array $filters): array 
+    { 
+        $grossRevenue = $query->where('status', 'completed')->sum('amount');
+        $refundedAmount = PaymentRefund::whereHas('payment', function($q) use ($filters) {
+            $this->applyFilters($q, $filters);
+        })->sum('amount');
+        
+        return [
+            'gross_revenue' => $grossRevenue,
+            'refunded_amount' => $refundedAmount,
+            'net_revenue' => $grossRevenue - $refundedAmount,
+        ];
+    }
+    
+    private function getCurrencyBreakdown($query, array $filters): array 
+    { 
+        return $query->select('currency', DB::raw('COUNT(*) as count'), DB::raw('SUM(amount) as total_amount'))
+            ->groupBy('currency')
+            ->orderBy('total_amount', 'desc')
+            ->get()
+            ->toArray();
+    }
+    
+    private function getMonthlyRevenue($query, array $filters): array 
+    { 
+        return $query->where('status', 'completed')
+            ->select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('SUM(amount) as revenue')
+            )
+            ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'))
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->limit(12)
+            ->get()
+            ->toArray();
+    }
+    
+    private function getDailyRevenue($query, array $filters): array 
+    { 
+        return $query->where('status', 'completed')
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(amount) as revenue')
+            )
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date', 'desc')
+            ->limit(30)
+            ->get()
+            ->toArray();
+    }
+    
+    private function getTopProducts($query, array $filters): array 
+    { 
+        return $query->select('product_name', DB::raw('COUNT(*) as count'), DB::raw('SUM(amount) as total_amount'))
+            ->whereNotNull('product_name')
+            ->groupBy('product_name')
+            ->orderBy('total_amount', 'desc')
+            ->limit(10)
+            ->get()
+            ->toArray();
+    }
+    
+    private function getCustomerAnalysis($query, array $filters): array 
+    { 
+        return [
+            'total_customers' => $query->distinct('user_id')->count('user_id'),
+            'new_customers' => $query->where('created_at', '>=', now()->subMonth())->distinct('user_id')->count('user_id'),
+            'repeat_customers' => $query->select('user_id')
+                ->groupBy('user_id')
+                ->havingRaw('COUNT(*) > 1')
+                ->count(),
+        ];
+    }
+    
+    private function getFraudIndicators($query, array $filters): array 
+    { 
+        return [
+            'high_value_transactions' => $query->where('amount', '>', 10000)->count(),
+            'failed_transactions' => $query->where('status', 'failed')->count(),
+            'suspicious_patterns' => $query->where('amount', '>', 5000)
+                ->where('status', 'failed')
+                ->count(),
+        ];
+    }
+    
+    private function getSuspiciousTransactions($query, array $filters): array 
+    { 
+        return $query->where('amount', '>', 10000)
+            ->where('status', 'failed')
+            ->orderBy('amount', 'desc')
+            ->limit(20)
+            ->get()
+            ->toArray();
+    }
+    
+    private function getRiskAnalysis($query, array $filters): array 
+    { 
+        $totalTransactions = $query->count();
+        $highRiskTransactions = $query->where('amount', '>', 5000)->where('status', 'failed')->count();
+        
+        return [
+            'total_transactions' => $totalTransactions,
+            'high_risk_transactions' => $highRiskTransactions,
+            'risk_percentage' => $totalTransactions > 0 ? round(($highRiskTransactions / $totalTransactions) * 100, 2) : 0,
+        ];
+    }
+    
+    private function getBlockedAttempts(array $filters): int 
+    { 
+        return Payment::where('status', 'blocked')
+            ->when(isset($filters['date_from']), function($q) use ($filters) {
+                $q->where('created_at', '>=', Carbon::parse($filters['date_from']));
+            })
+            ->when(isset($filters['date_to']), function($q) use ($filters) {
+                $q->where('created_at', '<=', Carbon::parse($filters['date_to']));
+            })
+            ->count();
+    }
+    
+    private function getFraudPreventionMetrics(array $filters): array 
+    { 
+        return [
+            'blocked_attempts' => $this->getBlockedAttempts($filters),
+            'fraud_detection_rate' => $this->calculateFraudDetectionRate($filters),
+            'prevention_success_rate' => $this->calculatePreventionSuccessRate($filters),
+        ];
+    }
+    
+    private function getCustomerSegments($query, array $filters): array 
+    { 
+        return [
+            'high_value_customers' => $query->select('user_id', DB::raw('SUM(amount) as total_spent'))
+                ->groupBy('user_id')
+                ->having('total_spent', '>', 10000)
+                ->count(),
+            'frequent_customers' => $query->select('user_id')
+                ->groupBy('user_id')
+                ->havingRaw('COUNT(*) > 5')
+                ->count(),
+            'new_customers' => $query->where('created_at', '>=', now()->subMonth())->distinct('user_id')->count('user_id'),
+        ];
+    }
+    
+    private function getPaymentPreferences($query, array $filters): array 
+    { 
+        return $query->select('gateway', DB::raw('COUNT(*) as count'), DB::raw('SUM(amount) as total_amount'))
+            ->groupBy('gateway')
+            ->orderBy('count', 'desc')
+            ->get()
+            ->toArray();
+    }
+    
+    private function getCustomerLifetimeValue($query, array $filters): array 
+    { 
+        return $query->select('user_id', DB::raw('SUM(amount) as lifetime_value'))
+            ->whereNotNull('user_id')
+            ->groupBy('user_id')
+            ->orderBy('lifetime_value', 'desc')
+            ->limit(20)
+            ->get()
+            ->toArray();
+    }
+    
+    private function getRetentionAnalysis($query, array $filters): array 
+    { 
+        $totalCustomers = $query->distinct('user_id')->count('user_id');
+        $returningCustomers = $query->select('user_id')
+            ->groupBy('user_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->count();
+            
+        return [
+            'total_customers' => $totalCustomers,
+            'returning_customers' => $returningCustomers,
+            'retention_rate' => $totalCustomers > 0 ? round(($returningCustomers / $totalCustomers) * 100, 2) : 0,
+        ];
+    }
+    
+    private function getChurnAnalysis($query, array $filters): array 
+    { 
+        $activeCustomers = $query->where('created_at', '>=', now()->subMonth())->distinct('user_id')->count('user_id');
+        $totalCustomers = $query->distinct('user_id')->count('user_id');
+        
+        return [
+            'active_customers' => $activeCustomers,
+            'total_customers' => $totalCustomers,
+            'churn_rate' => $totalCustomers > 0 ? round((($totalCustomers - $activeCustomers) / $totalCustomers) * 100, 2) : 0,
+        ];
+    }
+    
+    /**
+     * Apply filters to query
+     */
+    private function applyFilters($query, array $filters): void
+    {
+        if (isset($filters['date_from'])) {
+            $query->where('created_at', '>=', Carbon::parse($filters['date_from']));
+        }
+
+        if (isset($filters['date_to'])) {
+            $query->where('created_at', '<=', Carbon::parse($filters['date_to']));
+        }
+
+        if (isset($filters['gateway'])) {
+            $query->where('gateway', $filters['gateway']);
+        }
+    }
+    
+    /**
+     * Calculate fraud detection rate
+     */
+    private function calculateFraudDetectionRate(array $filters): float
+    {
+        $totalTransactions = Payment::when(isset($filters['date_from']), function($q) use ($filters) {
+            $q->where('created_at', '>=', Carbon::parse($filters['date_from']));
+        })->when(isset($filters['date_to']), function($q) use ($filters) {
+            $q->where('created_at', '<=', Carbon::parse($filters['date_to']));
+        })->count();
+        
+        $detectedFraud = Payment::where('status', 'blocked')
+            ->when(isset($filters['date_from']), function($q) use ($filters) {
+                $q->where('created_at', '>=', Carbon::parse($filters['date_from']));
+            })
+            ->when(isset($filters['date_to']), function($q) use ($filters) {
+                $q->where('created_at', '<=', Carbon::parse($filters['date_to']));
+            })
+            ->count();
+            
+        return $totalTransactions > 0 ? round(($detectedFraud / $totalTransactions) * 100, 2) : 0;
+    }
+    
+    /**
+     * Calculate prevention success rate
+     */
+    private function calculatePreventionSuccessRate(array $filters): float
+    {
+        $blockedAttempts = $this->getBlockedAttempts($filters);
+        $totalAttempts = Payment::when(isset($filters['date_from']), function($q) use ($filters) {
+            $q->where('created_at', '>=', Carbon::parse($filters['date_from']));
+        })->when(isset($filters['date_to']), function($q) use ($filters) {
+            $q->where('created_at', '<=', Carbon::parse($filters['date_to']));
+        })->count();
+        
+        return $totalAttempts > 0 ? round(($blockedAttempts / $totalAttempts) * 100, 2) : 0;
+    }
 }

@@ -112,7 +112,7 @@ class PaymentNotification extends Notification implements ShouldQueue
             ->line("Gateway: {$this->payment->gateway}")
             ->line("Transaction ID: {$this->payment->transaction_id}")
             ->line("Reason: {$this->data['reason'] ?? 'Unknown'}")
-            ->action('Retry Payment', route('payment-gateway.payment.retry', $this->payment->id))
+            ->action('Retry Payment', route('payment-gateway.payment.show', $this->payment->id))
             ->line('Please try again or contact support if the issue persists.');
     }
 

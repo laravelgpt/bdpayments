@@ -28,6 +28,9 @@ class Payment extends Model
         'refunded_amount',
         'refund_reason',
         'processed_at',
+        'product_name',
+        'customer_data',
+        'qr_code_path',
         'expires_at',
     ];
 

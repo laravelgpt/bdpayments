@@ -279,35 +279,45 @@ class QRCodeService
      */
     private function generateQRCode(string $data, array $options): string
     {
-        $size = $options['size'] ?? $this->config['size'] ?? 200;
-        $format = $options['format'] ?? $this->config['format'] ?? 'png';
-        $errorCorrection = $options['error_correction'] ?? $this->config['error_correction'] ?? 'M';
-        $margin = $options['margin'] ?? $this->config['margin'] ?? 1;
+        try {
+            $size = $options['size'] ?? $this->config['size'] ?? 200;
+            $format = $options['format'] ?? $this->config['format'] ?? 'png';
+            $errorCorrection = $options['error_correction'] ?? $this->config['error_correction'] ?? 'M';
+            $margin = $options['margin'] ?? $this->config['margin'] ?? 1;
 
-        $qrCode = QrCode::format($format)
-            ->size($size)
-            ->errorCorrection($errorCorrection)
-            ->margin($margin);
+            $qrCode = QrCode::format($format)
+                ->size($size)
+                ->errorCorrection($errorCorrection)
+                ->margin($margin);
 
-        // Add logo if specified
-        if (isset($options['logo']) && file_exists($options['logo'])) {
-            $qrCode->merge($options['logo'], 0.2, true);
-        }
-
-        // Apply custom styling
-        if (isset($options['style'])) {
-            $style = $options['style'];
-            
-            if (isset($style['color'])) {
-                $qrCode->color($style['color'][0], $style['color'][1], $style['color'][2]);
+            // Add logo if specified
+            if (isset($options['logo']) && file_exists($options['logo'])) {
+                $qrCode->merge($options['logo'], 0.2, true);
             }
-            
-            if (isset($style['background_color'])) {
-                $qrCode->backgroundColor($style['background_color'][0], $style['background_color'][1], $style['background_color'][2]);
-            }
-        }
 
-        return $qrCode->generate($data);
+            // Apply custom styling
+            if (isset($options['style'])) {
+                $style = $options['style'];
+                
+                if (isset($style['color'])) {
+                    $qrCode->color($style['color'][0], $style['color'][1], $style['color'][2]);
+                }
+                
+                if (isset($style['background_color'])) {
+                    $qrCode->backgroundColor($style['background_color'][0], $style['background_color'][1], $style['background_color'][2]);
+                }
+            }
+
+            return $qrCode->generate($data);
+        } catch (\Exception $e) {
+            Log::error('QR Code generation failed', [
+                'error' => $e->getMessage(),
+                'data' => $data,
+                'options' => $options,
+            ]);
+            
+            throw new \RuntimeException('QR Code generation failed: ' . $e->getMessage());
+        }
     }
 
     /**
